@@ -4,6 +4,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.function.Function;
@@ -20,8 +21,9 @@ public class FnCSVWriter<T> implements Function<FnCSVWriter.CSVWriterArgs<T>,FnC
 
         try {
         CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator(csvWriterArgs.lineSeparator);
-        PrintWriter writer = new PrintWriter(csvWriterArgs.outputPath, "UTF-8");
-       final CSVPrinter printer =new CSVPrinter(writer, csvFileFormat);
+
+        PrintWriter writer = (csvWriterArgs.outputStream != null) ? new PrintWriter(csvWriterArgs.outputStream) : new PrintWriter(csvWriterArgs.outputPath, "UTF-8");
+        final CSVPrinter printer =new CSVPrinter(writer, csvFileFormat);
         printer.printRecord(csvWriterArgs.headers);
         FnAnyToCSVRow<T> mapper=csvWriterArgs.mapFunction;
             for(T sourceObject:csvWriterArgs.sources){
@@ -40,6 +42,10 @@ public class FnCSVWriter<T> implements Function<FnCSVWriter.CSVWriterArgs<T>,FnC
         return new CSVWriteResult();
     }
 
+
+
+
+
     public static class CSVWriteResult{
 
         private final Throwable exception;
@@ -56,6 +62,7 @@ public class FnCSVWriter<T> implements Function<FnCSVWriter.CSVWriterArgs<T>,FnC
 
     public static class CSVWriterArgs<T>{
       private String outputPath;
+      private OutputStream outputStream;
         private String lineSeparator;
         private List<String> headers;
         private List<T> sources;
@@ -63,19 +70,22 @@ public class FnCSVWriter<T> implements Function<FnCSVWriter.CSVWriterArgs<T>,FnC
 
 
         public CSVWriterArgs(String outputDir,
+                             OutputStream outputStream,
                              List<String> headers,
                              FnAnyToCSVRow<T> mapFunction,
                              List<T> sources) {
 
 
-            this(outputDir,headers,"\n",mapFunction,sources);
+            this(outputDir,outputStream,headers,"\n",mapFunction,sources);
         }
 
         public CSVWriterArgs(String outputDir,
+                             OutputStream outputStream,
                              List<String> headers,
                              String lineSeparator,
                              FnAnyToCSVRow<T> mapFunction, List<T> sources) {
             this.outputPath = outputDir;
+            this.outputStream = outputStream;
             this.lineSeparator = lineSeparator;
             this.mapFunction = mapFunction;
             this.headers=headers;

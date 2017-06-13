@@ -39,25 +39,30 @@ public class CSV {
         private final List<Source> sources;
         private final FnAnyToCSVRow<Source> anyToCsvRowFn;
         private final CsvPath outputPath;
+        private final OutputStream outputStream;
         private final List<String> headers;
 
         private WriteOperation(List<Source> sources,
                                List<String> headers,
                                FnAnyToCSVRow<Source> anyToCsvRowFn,
-                               CsvPath outputPath) {
+                               CsvPath outputPath,
+                               OutputStream outputStream) {
 
             this.sources = sources;
             this.anyToCsvRowFn = anyToCsvRowFn;
             this.outputPath = outputPath;
+            this.outputStream = outputStream;
             this.headers=headers;
 
         }
 
         public FnCSVWriter.CSVWriteResult exec() {
 
+
             FnCSVWriter.CSVWriterArgs<Source> whereAndWhatWrite= new FnCSVWriter
                     .CSVWriterArgs<>(
                     outputPath.toString(),
+                    outputStream,
                     headers,
                     anyToCsvRowFn,
                     sources);
@@ -123,11 +128,12 @@ public class CSV {
     }
 
 
-    public  static class WriteBuilder<Source>{
+    public static class WriteBuilder<Source>{
 
         private List<Source> sources;
         private FnAnyToCSVRow<Source> func;
         private CsvPath csvPath;
+        private OutputStream outputStream;
         private List<String> headers;
         private  WriteBuilder(){}
         public WriteBuilder<Source> sources(List<Source> sources){ this.sources=sources; return this;}
@@ -135,15 +141,15 @@ public class CSV {
         public WriteBuilder<Source> setRowConverterFn(FnAnyToCSVRow<Source> anyToCsvRow){this.func =anyToCsvRow;
             return this;}
         public WriteBuilder<Source> onCsvFile(CsvPath csvPath){ this.csvPath=csvPath; return this;}
+        public WriteBuilder<Source> onMemory(OutputStream outputStream){ this.outputStream=outputStream; return this;}
 
         public WriteOperation<Source> create(){
 
             Objects.requireNonNull(this.sources);
             Objects.requireNonNull(this.func);
-            Objects.requireNonNull(this.csvPath);
             Objects.requireNonNull(this.headers);
 
-            return new WriteOperation<>(sources, headers, func, csvPath);
+            return new WriteOperation<>(sources, headers, func, csvPath, outputStream);
         }
     }
 
