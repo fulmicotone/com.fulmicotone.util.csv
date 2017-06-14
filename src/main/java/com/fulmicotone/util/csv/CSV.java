@@ -156,6 +156,7 @@ public class CSV {
 
         public WriteOperation<Source> create(){
 
+
             Objects.requireNonNull(this.sources);
             Objects.requireNonNull(this.func);
             Objects.requireNonNull(this.headers);
