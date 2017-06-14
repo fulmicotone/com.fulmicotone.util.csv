@@ -23,9 +23,8 @@ public class FnCSVReader<T>implements Function<
         try {
             Reader in = args.csvInputReader;
             Iterable<CSVRecord> records = args.withHeader ?
-                    CSVFormat.EXCEL.withHeader().parse(in) :
-                    CSVFormat.EXCEL.parse(in);
-            CSVFormat.EXCEL.withDelimiter(args.delimiter);
+                    CSVFormat.EXCEL.withHeader().withDelimiter(args.delimiter).parse(in) :
+                    CSVFormat.EXCEL.withDelimiter(args.delimiter).parse(in);
             Iterator<CSVRecord> i=records.iterator();
             List<T> resultList=new ArrayList<>();
             while(i.hasNext()) {resultList.add((T) args.mapFunction.apply(i.next()));}
