@@ -25,6 +25,7 @@ public class FnCSVReader<T>implements Function<
             Iterable<CSVRecord> records = args.withHeader ?
                     CSVFormat.EXCEL.withHeader().parse(in) :
                     CSVFormat.EXCEL.parse(in);
+            CSVFormat.EXCEL.withDelimiter(args.delimiter);
             Iterator<CSVRecord> i=records.iterator();
             List<T> resultList=new ArrayList<>();
             while(i.hasNext()) {resultList.add((T) args.mapFunction.apply(i.next()));}
@@ -46,6 +47,7 @@ public class FnCSVReader<T>implements Function<
         private Reader csvInputReader;
         private boolean withHeader = true;
         private FnCSVRowToAny<T> mapFunction;
+        private char delimiter = ',';
 
 
         public CSVReaderArgs(Reader csvReader,
@@ -61,6 +63,16 @@ public class FnCSVReader<T>implements Function<
             this.withHeader = withHeader;
             this.mapFunction = mapFunction;
             this.csvInputReader=csvReader;
+        }
+
+        public CSVReaderArgs(Reader csvReader,
+                             boolean withHeader,
+                             FnCSVRowToAny<T> mapFunction,
+                             char delimiter) {
+            this.withHeader = withHeader;
+            this.mapFunction = mapFunction;
+            this.csvInputReader=csvReader;
+            this.delimiter=delimiter;
         }
     }
 

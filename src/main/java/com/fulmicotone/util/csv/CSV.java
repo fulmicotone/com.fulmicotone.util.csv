@@ -14,13 +14,16 @@ public class CSV {
         private final FnCSVRowToAny decoderFn;
         private final boolean withHeaders;
         private Reader reader;
+        private char delimiter;
 
         private ReadOperation(FnCSVRowToAny decoderFn,
                               boolean withHeaders,
-                              Reader reader) {
+                              Reader reader,
+                              char delimiter) {
             this.decoderFn=decoderFn;
             this.withHeaders=withHeaders;
             this.reader =reader;
+            this.delimiter =delimiter;
         }
 
 
@@ -31,7 +34,8 @@ public class CSV {
                     .apply(new FnCSVReader
                             .CSVReaderArgs<>(reader,
                             withHeaders,
-                            decoderFn));
+                            decoderFn,
+                            delimiter));
         }
     }
 
@@ -84,6 +88,7 @@ public class CSV {
         private CsvPath csvPath;
         private boolean withHeaders=true;
         private ByteArrayOutputStream csvByteOutputStream;
+        private char delimiter =',';
 
         private  ReadingBuilder(){}
 
@@ -102,6 +107,12 @@ public class CSV {
             this.withHeaders=withHeaders;
             return this;
         }
+
+        public ReadingBuilder<Target> withDelimiter(char delimiter){
+            this.delimiter=delimiter;
+            return this;
+        }
+
 
 
         public ReadingBuilder<Target> setDecoderFn(FnCSVRowToAny decoderFn){
@@ -123,7 +134,7 @@ public class CSV {
                     reader=null;
                 }
             }
-            return new ReadOperation(func, withHeaders, reader);
+            return new ReadOperation(func, withHeaders, reader, delimiter);
         }
     }
 
