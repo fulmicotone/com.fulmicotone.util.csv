@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 
@@ -27,7 +28,9 @@ public class FnCSVReader<T>implements Function<
                     CSVFormat.EXCEL.withDelimiter(args.delimiter).parse(in);
             Iterator<CSVRecord> i=records.iterator();
             List<T> resultList=new ArrayList<>();
-            while(i.hasNext()) {resultList.add((T) args.mapFunction.apply(i.next()));}
+            while(i.hasNext()) {
+                Optional.ofNullable((T) args.mapFunction.apply(i.next())).ifPresent(resultList::add);
+            }
             return new CSVReadResult(resultList);
 
         }
