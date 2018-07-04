@@ -92,15 +92,8 @@ local.properties
 .texlipse
 
 
+/src/test/java/com/audiencerate/commons/RedisConcurrentLockTest.java
 .DS_Store
-
-
-# SPRING APPLICATION DEV
-application-dev.properties
-
-# TESTS
-DownloadFileServiceTest.java
-*.hprof
-*.idom
-src/test/resources
-src/test
+gradlew
+gradlew.bat
+gradle
