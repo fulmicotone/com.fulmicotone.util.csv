@@ -89,6 +89,7 @@ public class CSV {
         private CsvPath csvPath;
         private boolean withHeaders=true;
         private ByteArrayOutputStream csvByteOutputStream;
+        private InputStream csvByteInputStream;
         private char delimiter =',';
 
         private  ReadingBuilder(){}
@@ -100,6 +101,11 @@ public class CSV {
 
         public ReadingBuilder<Target> from(ByteArrayOutputStream byteArrayOutputStream){
             this.csvByteOutputStream=byteArrayOutputStream;
+            return this;
+        }
+
+        public ReadingBuilder<Target> from(InputStream csvByteInputStream){
+            this.csvByteInputStream=csvByteInputStream;
             return this;
         }
 
@@ -125,9 +131,13 @@ public class CSV {
             Objects.requireNonNull(this.func);
 
             Reader reader=null;
+            if(this.csvByteInputStream!=null){
+                reader= new InputStreamReader(this.csvByteInputStream);
+            }
             if(this.csvByteOutputStream!=null){
                 reader= new InputStreamReader(new ByteArrayInputStream(this.csvByteOutputStream.toByteArray()));
-            }else if(this.csvPath!=null){
+            }
+            else if(this.csvPath!=null){
                 try {
                     reader= new FileReader(this.csvPath.toString());
                 } catch (FileNotFoundException e) {
